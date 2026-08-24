@@ -24,6 +24,9 @@ git clone https://github.com/rezolved/conversational-commerce-benchmark-framewor
 cd conversational-commerce-benchmark-framework
 python3 -m venv .venv
 source .venv/bin/activate
+# CPU torch first — a plain `pip install -r requirements.txt` may pull
+# multi-GB NVIDIA wheels that txtai does not need for the hashing smoke path.
+pip install torch --index-url https://download.pytorch.org/whl/cpu
 pip install -r requirements.txt
 
 export EMBEDDING_PROVIDER=hashing

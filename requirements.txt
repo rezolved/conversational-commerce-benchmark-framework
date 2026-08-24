@@ -1,3 +1,5 @@
+# Install CPU torch first if you do not need a GPU:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
 txtai>=9.6,<10
 openai>=2.24,<3
 python-dotenv>=1.0,<2
