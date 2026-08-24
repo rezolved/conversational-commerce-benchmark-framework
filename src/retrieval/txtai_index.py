@@ -42,9 +42,15 @@ def hashing_transform(texts: list[str], dimensions: int = 384) -> np.ndarray:
     return matrix
 
 
+def _allow_external_transform() -> None:
+    # txtai >=9.12 refuses string transform paths unless this is set.
+    os.environ.setdefault("ALLOW_RESOLVE_TRANSFORM", "True")
+
+
 def create_embeddings(config: EmbeddingConfig) -> Embeddings:
     provider = config.provider.lower().strip()
     if provider == "openai_compatible":
+        _allow_external_transform()
         if config.base_url:
             os.environ["EMBEDDING_BASE_URL"] = config.base_url
         if config.api_key:
@@ -73,6 +79,7 @@ def create_embeddings(config: EmbeddingConfig) -> Embeddings:
         )
 
     if provider == "hashing":
+        _allow_external_transform()
         return Embeddings(
             {
                 "method": "external",
