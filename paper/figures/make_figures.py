@@ -2,11 +2,11 @@
 """Generate publication-quality paper figures from CSVs using Seaborn.
 
 Produces:
-  - leaderboard_errorbars.pdf  (horizontal bar chart with error bars, tier shading)
+  - leaderboard_errorbars.pdf  (horizontal bar chart with error bars, rank-band shading)
   - rubric_heatmap.pdf         (annotated heatmap of per-rubric pass rates)
   - variance_dotplot.pdf       (dot-plot of per-model run-to-run sigma)
 
-Style reference: RecBench+ (Huang et al., WSDM 2026).
+Template: CEURART single-column (textwidth ≈ 160 mm ≈ 6.3 in).
 """
 
 from __future__ import annotations
@@ -28,10 +28,11 @@ HERE = Path(__file__).resolve().parent
 sns.set_theme(
     style="whitegrid",
     context="paper",
-    font_scale=0.95,
+    font_scale=1.0,
     rc={
         "font.family": "sans-serif",
         "font.sans-serif": ["DejaVu Sans", "Helvetica", "Arial"],
+        "font.size": 9,
         "axes.linewidth": 0.6,
         "grid.linewidth": 0.4,
         "xtick.major.width": 0.5,
@@ -39,18 +40,18 @@ sns.set_theme(
         "figure.dpi": 300,
         "savefig.dpi": 300,
         "savefig.bbox": "tight",
-        "savefig.pad_inches": 0.02,
+        "savefig.pad_inches": 0.05,
     },
 )
 
-COLUMN_WIDTH = 3.35  # acmart sigconf single-column width in inches
+# CEURART single-column text width in inches (~160 mm)
+COLUMN_WIDTH = 6.3
 
-# ── Tier palette ─────────────────────────────────────────────────────────────
+# ── Band palette (ranks 1–7 vs 8–12; not a 4.6 score cut) ────────────────────
 
-TIER_COLORS = {
-    "top": "#3a86a8",     # teal-blue for top tier (>=4.6)
-    "mid": "#7fb685",     # muted green for mid tier (>=3.5)
-    "low": "#d4856a",     # warm coral for lower tier
+BAND_COLORS = {
+    "high": "#3a86a8",  # teal-blue for ranks 1–7
+    "low": "#7fb685",   # muted green for ranks 8–12
 }
 
 
@@ -88,60 +89,59 @@ def read_rubric_matrix() -> tuple[list[str], list[str], np.ndarray]:
 
 def plot_leaderboard() -> None:
     models, means, sigmas = read_leaderboard()
+    # Sort ascending for bottom-to-top layout (highest score at top after invert_yaxis)
     order = np.argsort(means)
     models = [models[i] for i in order]
     means = means[order]
     sigmas = sigmas[order]
 
-    colors = []
-    for m in means:
-        if m >= 4.6:
-            colors.append(TIER_COLORS["top"])
-        elif m >= 3.5:
-            colors.append(TIER_COLORS["mid"])
-        else:
-            colors.append(TIER_COLORS["low"])
-
-    fig_h = max(2.4, 0.28 * len(models) + 0.8)
+    n = len(models)
+    # Ascending sort: last 7 entries are ranks 1–7 (highest scores).
+    colors = [
+        BAND_COLORS["high"] if i >= n - 7 else BAND_COLORS["low"]
+        for i in range(n)
+    ]
+    # 0.20 in per row + 0.8 in margins — compact enough for a workshop paper
+    fig_h = max(2.8, 0.20 * n + 0.8)
     fig, ax = plt.subplots(figsize=(COLUMN_WIDTH, fig_h))
 
-    y = np.arange(len(models))
-    bars = ax.barh(
+    y = np.arange(n)
+    ax.barh(
         y, means, xerr=sigmas,
         color=colors, edgecolor="white", linewidth=0.3,
-        error_kw=dict(ecolor="#444444", capsize=2.5, capthick=0.7, elinewidth=0.7),
-        height=0.62, zorder=3,
+        error_kw=dict(ecolor="#444444", capsize=2.0, capthick=0.6, elinewidth=0.6),
+        height=0.55, zorder=3,
     )
 
     # Value annotations
     for i, (mean, sigma) in enumerate(zip(means, sigmas)):
         ax.text(
-            mean + sigma + 0.03, i, f"{mean:.2f}",
-            va="center", ha="left", fontsize=6.5, color="#333333",
+            mean + sigma + 0.02, i, f"{mean:.2f}",
+            va="center", ha="left", fontsize=7, color="#333333",
         )
 
     ax.set_yticks(y)
     ax.set_yticklabels(models, fontsize=7.5)
-    ax.set_xlabel("Mean rubric score (/5)", fontsize=8.5, labelpad=4)
-    ax.set_xlim(2.8, 5.15)
+    ax.set_xlabel("Mean rubric score (/5)", fontsize=8.5, labelpad=3)
+    ax.set_xlim(2.8, 5.25)
     ax.invert_yaxis()
     ax.xaxis.grid(True, linestyle="--", alpha=0.4, linewidth=0.4)
     ax.yaxis.grid(False)
     ax.set_axisbelow(True)
 
-    # Tier legend
     legend_patches = [
-        mpatches.Patch(color=TIER_COLORS["top"], label="Top tier (≥4.6)"),
-        mpatches.Patch(color=TIER_COLORS["mid"], label="Mid tier (≥3.5)"),
-        mpatches.Patch(color=TIER_COLORS["low"], label="Lower tier (<3.5)"),
+        mpatches.Patch(color=BAND_COLORS["high"], label="Ranks 1–7"),
+        mpatches.Patch(color=BAND_COLORS["low"], label="Ranks 8–12"),
     ]
     ax.legend(
-        handles=legend_patches, loc="lower right",
-        fontsize=6, framealpha=0.9, edgecolor="#cccccc",
+        handles=legend_patches, loc="upper center",
+        bbox_to_anchor=(0.5, -0.07), ncol=2,
+        fontsize=7.5, framealpha=0.9, edgecolor="#cccccc",
+        borderpad=0.3, columnspacing=0.8,
     )
 
     sns.despine(left=True, bottom=False)
-    fig.tight_layout()
+    fig.tight_layout(pad=0.4)
     out = HERE / "leaderboard_errorbars.pdf"
     fig.savefig(out)
     plt.close(fig)
@@ -152,7 +152,9 @@ def plot_leaderboard() -> None:
 def plot_rubric_heatmap() -> None:
     models, col_labels, mat = read_rubric_matrix()
 
-    fig, ax = plt.subplots(figsize=(COLUMN_WIDTH, 2.8))
+    n = len(models)
+    fig_h = max(2.8, 0.19 * n + 0.8)
+    fig, ax = plt.subplots(figsize=(COLUMN_WIDTH, fig_h))
 
     sns.heatmap(
         mat,
@@ -161,22 +163,23 @@ def plot_rubric_heatmap() -> None:
         fmt=".2f",
         cmap="RdYlGn",
         vmin=0.4, vmax=1.0,
-        linewidths=0.8,
+        linewidths=0.4,
         linecolor="white",
         cbar_kws={
             "label": "Pass rate",
-            "shrink": 0.85,
-            "aspect": 20,
+            "shrink": 0.75,
+            "aspect": 30,
+            "pad": 0.02,
         },
         annot_kws={"size": 7},
         square=False,
     )
 
-    ax.set_xticklabels(col_labels, rotation=30, ha="right", fontsize=7.5)
+    ax.set_xticklabels(col_labels, rotation=30, ha="right", fontsize=8)
     ax.set_yticklabels(models, rotation=0, fontsize=7.5)
     ax.tick_params(axis="both", length=0)
 
-    fig.tight_layout()
+    fig.tight_layout(pad=0.4)
     out = HERE / "rubric_heatmap.pdf"
     fig.savefig(out)
     plt.close(fig)
@@ -191,39 +194,34 @@ def plot_variance_dotplot() -> None:
     means = means[order]
     sigmas = sigmas[order]
 
-    colors = []
-    for m in means:
-        if m >= 4.6:
-            colors.append(TIER_COLORS["top"])
-        elif m >= 3.5:
-            colors.append(TIER_COLORS["mid"])
-        else:
-            colors.append(TIER_COLORS["low"])
+    n = len(models)
+    colors = [
+        BAND_COLORS["high"] if i < 7 else BAND_COLORS["low"]
+        for i in range(n)
+    ]
+    fig_h = max(3.5, 0.28 * n + 0.8)
+    fig, ax = plt.subplots(figsize=(COLUMN_WIDTH, fig_h))
 
-    fig, ax = plt.subplots(figsize=(COLUMN_WIDTH, 2.4))
+    y = np.arange(n)
+    ax.scatter(sigmas, y, c=colors, s=55, zorder=3, edgecolors="white", linewidths=0.5)
 
-    y = np.arange(len(models))
-    ax.scatter(sigmas, y, c=colors, s=45, zorder=3, edgecolors="white", linewidths=0.5)
-
-    # Horizontal reference lines
     for yi in y:
         ax.axhline(yi, color="#eeeeee", linewidth=0.4, zorder=1)
 
-    # Annotations
-    for i, (s, m) in enumerate(zip(sigmas, models)):
-        ax.text(s + 0.008, i, f"{s:.2f}", va="center", ha="left", fontsize=6.5, color="#555555")
+    for i, (s, _) in enumerate(zip(sigmas, models)):
+        ax.text(s + 0.006, i, f"{s:.2f}", va="center", ha="left", fontsize=8, color="#555555")
 
     ax.set_yticks(y)
-    ax.set_yticklabels(models, fontsize=7.5)
-    ax.set_xlabel("Run-to-run σ (5 runs × 20 scenarios)", fontsize=8, labelpad=4)
-    ax.set_xlim(-0.01, max(sigmas) + 0.08)
+    ax.set_yticklabels(models, fontsize=8)
+    ax.set_xlabel("Run-to-run σ (5 runs × 20 scenarios)", fontsize=9, labelpad=4)
+    ax.set_xlim(-0.01, max(sigmas) + 0.07)
     ax.invert_yaxis()
     ax.xaxis.grid(True, linestyle="--", alpha=0.4, linewidth=0.4)
     ax.yaxis.grid(False)
     ax.set_axisbelow(True)
 
     sns.despine(left=True, bottom=False)
-    fig.tight_layout()
+    fig.tight_layout(pad=0.4)
     out = HERE / "variance_dotplot.pdf"
     fig.savefig(out)
     plt.close(fig)

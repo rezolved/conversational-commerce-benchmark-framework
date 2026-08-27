@@ -57,6 +57,25 @@ PYTHONPATH=src python scripts/run_benchmark.py \
 `--skip-judge` skips the LLM-as-judge step. A full paper-style run also needs
 `JUDGE_*` credentials and should omit `--limit`.
 
+### Execution fidelity
+
+Saved transcripts and judge input include assistant tool calls and tool results
+by default. This evidence is required to evaluate grounding and add-to-cart
+correctness. `--omit-tool-messages` is available for debugging only; scores
+from that mode are not comparable because the judge cannot verify claims
+against tool output.
+
+The evaluated assistant model also performs the LLM-based re-ranking step
+after vector retrieval. The index, tool schema, and prompts are fixed, but the
+re-ranker is therefore model-dependent rather than an identical external
+component.
+
+The paper's reported scores were produced by Rezolve AI's internal QuePasa
+evaluation endpoint. `src/benchmark/judge.py` is a public, OpenAI-compatible
+reference implementation of the same five-rubric interface. It supports new
+evaluations but cannot exactly reproduce proprietary judge outputs that are
+not part of this jeans-only release.
+
 ## Five evaluation rubrics
 
 Each conversation is scored 0/1 on:
@@ -88,12 +107,23 @@ paper/figures/
   leaderboard.csv                 # Published jeans leaderboard
   rubric_scores.csv               # Per-rubric pass rates
   make_figures.py                 # Figure regeneration helper
+tests/
+  test_conversation.py            # Tool-transcript fidelity checks
+  test_deterministic_hashing.py   # Cross-process hashing checks
 ```
 
 ## Data
 
 The catalog is a derived subset of the public Amazon Reviews 2023 dataset
 (Hou et al., 2024). See [DATA.md](DATA.md).
+
+## Offline verification
+
+After installing dependencies, run:
+
+```bash
+PYTHONPATH=src python -m unittest discover -s tests -v
+```
 
 ## Citation
 

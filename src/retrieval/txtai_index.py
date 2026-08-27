@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 from typing import Any
@@ -31,10 +32,12 @@ def openai_compatible_transform_env(texts: list[str]) -> np.ndarray:
 
 
 def hashing_transform(texts: list[str], dimensions: int = 384) -> np.ndarray:
+    """Return deterministic token-hashing vectors for offline smoke tests."""
     matrix = np.zeros((len(texts), dimensions), dtype=np.float32)
     for row, text in enumerate(texts):
         for token in text.lower().split():
-            index = hash(token) % dimensions
+            digest = hashlib.blake2b(token.encode("utf-8"), digest_size=8).digest()
+            index = int.from_bytes(digest, byteorder="little") % dimensions
             matrix[row, index] += 1.0
         norm = np.linalg.norm(matrix[row])
         if norm > 0:

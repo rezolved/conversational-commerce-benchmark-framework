@@ -33,10 +33,10 @@ def run_conversation(
     assistant: PureLLMAssistantAgent,
     golden_messages: list[dict[str, str]],
     max_turns: int = MAX_TURNS,
-    include_tool_messages: bool = False,
+    include_tool_messages: bool = True,
     scenario_timeout: float = SCENARIO_TIMEOUT,
 ) -> dict[str, Any]:
-    """Run a multi-turn conversation between customer emulation and assistant agent."""
+    """Run a conversation, preserving tool calls/results for grounded judging by default."""
     system_prompt = customer.build_system_prompt(golden_messages)
     conversation: list[dict[str, Any]] = []
     turn_details: list[dict[str, Any]] = []
@@ -118,9 +118,9 @@ def run_benchmark(
     judge_base_url: str | None = None,
     judge_api_key: str | None = None,
     skip_judge: bool = False,
-    include_tool_messages: bool = False,
+    include_tool_messages: bool = True,
 ) -> dict[str, Any]:
-    """Run full benchmark: conversation generation + judgement scoring."""
+    """Run the benchmark, retaining tool evidence unless explicitly disabled."""
     results: list[dict[str, Any]] = []
     num_success = 0
     num_failed = 0

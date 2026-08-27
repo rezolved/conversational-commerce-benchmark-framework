@@ -51,6 +51,11 @@ def main() -> None:
     parser.add_argument("--limit", type=int, default=None, help="Limit scenarios")
     parser.add_argument("--output-dir", default="artifacts/results", help="Output base dir")
     parser.add_argument("--skip-judge", action="store_true", help="Skip judging")
+    parser.add_argument(
+        "--omit-tool-messages",
+        action="store_true",
+        help="Omit tool calls/results from saved transcripts and judge input (not recommended)",
+    )
     args = parser.parse_args()
 
     model_tag, model_id = resolve_model(args.model)
@@ -112,6 +117,7 @@ def main() -> None:
             judge_base_url=os.getenv("JUDGE_BASE_URL"),
             judge_api_key=os.getenv("JUDGE_API_KEY", os.getenv("OPENAI_API_KEY", "")),
             skip_judge=args.skip_judge,
+            include_tool_messages=not args.omit_tool_messages,
         )
 
         full_output = {
