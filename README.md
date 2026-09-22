@@ -11,7 +11,7 @@ Minimal public artefacts for:
 > [workshop website](https://genai-ecommerce.github.io/GenAIECommerce2026)
 > under CC BY 4.0.
 
-[Explore the project website](https://rezolved.github.io/conversational-commerce-benchmark-framework/)
+[Explore the project website](https://diogocarvalho88.github.io/conversational-commerce-benchmark-framework/)
 or [read the published paper](https://genai-ecommerce.github.io/assets/papers/GenAIECommerce2026/recsys2026-workshops_paper_99.pdf).
 
 This dump is **jeans-only**: the Amazon Reviews 2023 jeans catalog, 20 frozen

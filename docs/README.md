@@ -25,7 +25,7 @@ interaction. The relative asset paths also permit direct opening from
 The publication source is the `docs/` folder on the repository's default
 branch. The live project page is:
 
-<https://rezolved.github.io/conversational-commerce-benchmark-framework/>
+<https://diogocarvalho88.github.io/conversational-commerce-benchmark-framework/>
 
 The Open Graph cover is `assets/images/og-cover.png`; the page metadata uses
 its absolute live URL for social previews.
