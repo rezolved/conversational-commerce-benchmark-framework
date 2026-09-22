@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090676">
+  <meta name="description" content="A visual walkthrough of the GenAI-eCom 2026 paper on reproducible evaluation of large language models across the complete conversational shopping journey.">
+  <meta name="author" content="Rezolve Ai Labs">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Benchmarking Models for Conversational E-Commerce · Paper Walkthrough">
+  <meta property="og:description" content="Read the paper contribution, controlled study, findings, limitations, and wider research connections from GenAI-eCom at ACM RecSys 2026.">
+  <meta property="og:url" content="https://rezolved.github.io/conversational-commerce-benchmark-framework/">
+  <meta property="og:image" content="https://rezolved.github.io/conversational-commerce-benchmark-framework/assets/images/og-cover.png">
+  <meta property="article:published_time" content="2026-09-28">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://rezolved.github.io/conversational-commerce-benchmark-framework/assets/images/og-cover.png">
+  <meta name="citation_title" content="Benchmarking Models for Conversational E-Commerce: A Reproducible Evaluation Framework">
+  <meta name="citation_conference_title" content="Third Workshop on Agentic and Generative AI for E-Commerce, ACM RecSys 2026">
+  <meta name="citation_publication_date" content="2026-09-28">
+  <meta name="citation_pdf_url" content="https://genai-ecommerce.github.io/assets/papers/GenAIECommerce2026/recsys2026-workshops_paper_99.pdf">
+  <title>Paper Walkthrough | Benchmarking Models for Conversational E-Commerce</title>
+  <link rel="canonical" href="https://rezolved.github.io/conversational-commerce-benchmark-framework/">
+  <link rel="icon" href="assets/logos/rezolve-icon.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/fonts/Barlow-ExtraBold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to the research</a>
+
+  <header class="site-header" data-header>
+    <div class="container nav-shell">
+      <a class="brand" href="#top" aria-label="Rezolve Ai Labs research homepage">
+        <img src="assets/logos/rezolve-mark-on-dark.svg" alt="Rezolve AI">
+        <span>Research</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" data-nav-toggle>
+        <span class="sr-only">Open navigation</span>
+        <span></span><span></span>
+      </button>
+      <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation" data-nav>
+        <a href="#paper">Paper</a>
+        <a href="#framework">Framework</a>
+        <a href="#study">Study</a>
+        <a href="#findings">Findings</a>
+        <a href="#practice">Practice</a>
+        <a href="#resources">Resources</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="hero-glow hero-glow-one" aria-hidden="true"></div>
+      <div class="hero-glow hero-glow-two" aria-hidden="true"></div>
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow light">Published workshop paper · ACM RecSys 2026</p>
+          <h1>Benchmarking Models for Conversational E-Commerce</h1>
+          <p class="paper-subtitle">A Reproducible Evaluation Framework</p>
+          <p class="hero-lead">
+            A reproducible framework for measuring how LLM shopping assistants understand intent,
+            clarify needs, recommend products, use commerce tools, and keep their claims grounded
+            across a multi-turn journey.
+          </p>
+          <div class="hero-actions" aria-label="Research links">
+            <a class="button button-primary" href="https://genai-ecommerce.github.io/assets/papers/GenAIECommerce2026/recsys2026-workshops_paper_99.pdf">Read the paper</a>
+            <a class="button button-secondary" href="https://github.com/rezolved/conversational-commerce-benchmark-framework">Explore the benchmark</a>
+          </div>
+          <p class="hero-note">A visual walkthrough of the paper published at the Third Workshop on Agentic and Generative AI for E-Commerce, Minneapolis · 28 September 2026.</p>
+        </div>
+
+        <aside class="hero-panel" aria-label="Study overview">
+          <p class="panel-kicker">The complete shopping loop</p>
+          <div class="capability-orbit" aria-hidden="true">
+            <span class="orbit-center">Agent</span>
+            <span class="orbit-item orbit-one">Intent</span>
+            <span class="orbit-item orbit-two">Clarify</span>
+            <span class="orbit-item orbit-three">Recommend</span>
+            <span class="orbit-item orbit-four">Cart</span>
+            <span class="orbit-item orbit-five">Ground</span>
+          </div>
+          <div class="hero-stat-grid">
+            <div><strong>12</strong><span>models</span></div>
+            <div><strong>20</strong><span>scenarios</span></div>
+            <div><strong>5</strong><span>runs</span></div>
+            <div><strong>1,200</strong><span>conversations</span></div>
+          </div>
+        </aside>
+      </div>
+      <div class="container author-line">
+        <span>Yuri Vorontsov</span>
+        <span>Diogo S. Carvalho</span>
+        <span>Anastasia Vorontsov</span>
+        <span>Anna Platonova</span>
+        <span>Vladimir Gorovoy</span>
+        <span>Ilya Briskin</span>
+        <span>Felix Tseitlin</span>
+        <span>Senka Krivic</span>
+        <span>Salman Ahmad</span>
+      </div>
+    </section>
+
+    <section class="section paper-context-section" id="paper" aria-labelledby="paper-context-title">
+      <div class="container paper-context-layout">
+        <div class="section-intro compact">
+          <p class="eyebrow">About this paper</p>
+          <h2 id="paper-context-title">Research presented as a visual walkthrough</h2>
+          <p>
+            This page unpacks the paper’s method, evidence, practical implications, and limits.
+            The contribution is a reusable evaluation framework; the twelve-model jeans study is
+            its controlled worked example rather than a universal ranking of shopping assistants.
+          </p>
+        </div>
+        <div class="venue-grid" aria-label="Publication venue context">
+          <article class="venue-card">
+            <span class="venue-label">Main conference</span>
+            <h3>ACM RecSys 2026</h3>
+            <p>
+              The twentieth ACM Conference on Recommender Systems is the field’s premier international
+              forum, bringing together academic researchers and industry practitioners. ICORE 2026
+              ranks RecSys A, defined as “Excellent.”
+            </p>
+            <div class="venue-links">
+              <a href="https://recsys.acm.org/recsys26/">Conference context <span aria-hidden="true">→</span></a>
+              <a href="https://portal.core.edu.au/conf-ranks/28/">ICORE record <span aria-hidden="true">→</span></a>
+            </div>
+          </article>
+          <article class="venue-card">
+            <span class="venue-label">Publication venue</span>
+            <h3>GenAI-eCom 2026</h3>
+            <p>
+              The third Workshop on Agentic and Generative AI for E-Commerce continues a series
+              launched in 2024. It connects academic research with industry applications across
+              recommendation, search, autonomous shopping agents, and trustworthy deployment.
+            </p>
+            <div class="venue-links">
+              <a href="https://genai-ecommerce.github.io/GenAIECommerce2026">Workshop and proceedings <span aria-hidden="true">→</span></a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section overview" aria-labelledby="overview-title">
+      <div class="container">
+        <div class="section-intro compact">
+          <p class="eyebrow">Research in one view</p>
+          <h2 id="overview-title">A controlled way to see what shopping agents can actually do</h2>
+          <p>
+            The paper treats conversational commerce as one connected journey across recommendation,
+            retrieval, dialogue, and transactions. Its framework evaluates those capabilities together
+            while preserving the trace evidence needed to explain each score.
+          </p>
+        </div>
+        <div class="summary-grid">
+          <a class="summary-card" href="#framework">
+            <span class="card-index">01</span>
+            <h3>A reusable evaluation instrument</h3>
+            <p>Freeze the catalog, opening request, system prompt, and tools. Compare models through repeated journeys and five behaviour-level scores.</p>
+            <span class="text-link">See the framework <span aria-hidden="true">→</span></span>
+          </a>
+          <a class="summary-card" href="#findings">
+            <span class="card-index">02</span>
+            <h3>Capability profiles with uncertainty</h3>
+            <p>The leading models form an overlapping band. Clarification differentiates that band, while grounding separates the wider roster.</p>
+            <span class="text-link">Explore the evidence <span aria-hidden="true">→</span></span>
+          </a>
+          <a class="summary-card" href="#practice">
+            <span class="card-index">03</span>
+            <h3>Evidence for better system decisions</h3>
+            <p>Teams can select models, diagnose specific weaknesses, test changes to prompts and tools, and track progress on their own catalog.</p>
+            <span class="text-link">Apply the lessons <span aria-hidden="true">→</span></span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section need-section" aria-labelledby="need-title">
+      <div class="container split-layout">
+        <div class="section-intro sticky-copy">
+          <p class="eyebrow">The evaluation need</p>
+          <h2 id="need-title">Conversational commerce requires complete-loop evidence</h2>
+          <p>
+            A shopping assistant operates across an evolving conversation. It interprets the customer,
+            decides when to ask, searches a live catalog, turns retrieved evidence into recommendations,
+            and executes cart actions faithfully.
+          </p>
+          <p>
+            Strong performance in one component cannot establish the quality of the complete journey.
+            Teams need repeatable evidence that supports model selection, capability diagnosis,
+            intervention testing, and progress tracking.
+          </p>
+          <p class="related-note">
+            This work brings together ideas from conversational recommendation, agent evaluation,
+            tool use, and e-commerce knowledge benchmarks in one controlled shopping protocol.
+          </p>
+        </div>
+        <div class="purpose-grid" aria-label="Four uses of the benchmark">
+          <article class="purpose-card">
+            <span>01</span>
+            <h3>Select with evidence</h3>
+            <p>Compare candidate models on the behaviours that matter for a particular commerce experience.</p>
+          </article>
+          <article class="purpose-card">
+            <span>02</span>
+            <h3>Diagnose capability gaps</h3>
+            <p>Separate clarification, recommendation, grounding, and transactional failures hidden by a total score.</p>
+          </article>
+          <article class="purpose-card">
+            <span>03</span>
+            <h3>Test interventions</h3>
+            <p>Measure the effect of a model, prompt, retrieval, or tool change under matched conditions.</p>
+          </article>
+          <article class="purpose-card">
+            <span>04</span>
+            <h3>Track progress</h3>
+            <p>Repeat the protocol across releases and retain the traces that explain movement in the metrics.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section framework-section" id="framework" aria-labelledby="framework-title">
+      <div class="container">
+        <div class="section-intro">
+          <p class="eyebrow">The framework</p>
+          <h2 id="framework-title">A controlled instrument for the complete shopping journey</h2>
+          <p>
+            The catalog and customer intent enter a frozen scenario. A simulated customer interacts with
+            the model under evaluation through the same search and cart tools. Every message, tool call,
+            result, and action remains available for scoring and audit.
+          </p>
+        </div>
+
+        <div class="pipeline" role="img" aria-label="Catalog and intent flow through a controlled scenario, customer and agent interaction, dialogue trace, and repeated evaluation">
+          <article class="pipeline-node">
+            <span class="pipeline-number">01</span>
+            <h3>Catalog + intent</h3>
+            <p>Products and real shopping queries ground the task.</p>
+          </article>
+          <span class="pipeline-arrow" aria-hidden="true">→</span>
+          <article class="pipeline-node">
+            <span class="pipeline-number">02</span>
+            <h3>Controlled scenario</h3>
+            <p>The opening request and expected behaviour are frozen.</p>
+          </article>
+          <span class="pipeline-arrow" aria-hidden="true">→</span>
+          <article class="pipeline-node accent">
+            <span class="pipeline-number">03</span>
+            <h3>Customer ↔ agent</h3>
+            <p>The same system prompt, search tool, and cart tool frame the interaction.</p>
+          </article>
+          <span class="pipeline-arrow" aria-hidden="true">→</span>
+          <article class="pipeline-node dark">
+            <span class="pipeline-number">04</span>
+            <h3>Dialogue + trace</h3>
+            <p>Claims, calls, results, and actions form the evidence record.</p>
+          </article>
+          <span class="pipeline-arrow" aria-hidden="true">→</span>
+          <article class="pipeline-node">
+            <span class="pipeline-number">05</span>
+            <h3>Repeat + audit</h3>
+            <p>Five rubrics, repeated runs, intervals, and evaluator checks complete the protocol.</p>
+          </article>
+        </div>
+
+        <div class="control-band">
+          <div>
+            <span class="control-label">Held constant</span>
+            <p>Catalog · opening message · system prompt · search and cart tools</p>
+          </div>
+          <div>
+            <span class="control-label">Measured output</span>
+            <p>Behaviour profile · complete trace · repeated estimates · evaluator sensitivity</p>
+          </div>
+        </div>
+
+        <div class="capabilities" aria-label="Five benchmark capabilities">
+          <article>
+            <span class="capability-icon">I</span>
+            <h3>Intent</h3>
+            <p>Tracks the shopper’s evolving goal across the conversation.</p>
+          </article>
+          <article>
+            <span class="capability-icon">C</span>
+            <h3>Clarification</h3>
+            <p>Asks targeted questions when the request needs refinement.</p>
+          </article>
+          <article>
+            <span class="capability-icon">R</span>
+            <h3>Recommendation</h3>
+            <p>Matches suggestions to the preferences the shopper expressed.</p>
+          </article>
+          <article>
+            <span class="capability-icon">A</span>
+            <h3>Cart correctness</h3>
+            <p>Executes and reports transactional actions faithfully.</p>
+          </article>
+          <article>
+            <span class="capability-icon">G</span>
+            <h3>Grounding</h3>
+            <p>Connects every product claim to evidence returned by a tool.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section trace-section" aria-labelledby="trace-title">
+      <div class="container trace-layout">
+        <div class="section-intro light-copy">
+          <p class="eyebrow light">A worked shopping journey</p>
+          <h2 id="trace-title">The trace makes a convincing failure visible</h2>
+          <p>
+            A published paper example starts with a shopper asking for a vintage-wash denim shirt.
+            The assistant confidently describes a shirt before searching. Its later catalog call returns
+            jeans, leaving the original product claims unsupported.
+          </p>
+          <p>
+            The conversation sounds fluent. The evidence record shows intent drift, an irrelevant
+            recommendation, and a grounding failure. Behaviour-level scoring captures the difference.
+          </p>
+          <p class="trace-source">Paper example · scenario <code>gisela_ribeiro_3</code> · Qwen3-30B-A3B · evaluated trace is not included in the public release</p>
+        </div>
+
+        <div class="conversation" aria-label="Example benchmark conversation and verdict">
+          <div class="message shopper-message">
+            <span>Shopper</span>
+            <p>“Got any vintage-wash denim shirts for women?”</p>
+          </div>
+          <div class="message agent-message">
+            <span>Assistant behaviour · before retrieval</span>
+            <p>Describes a denim shirt and its product details before searching the catalog.</p>
+          </div>
+          <div class="message tool-message">
+            <span><code>catalog_search</code> evidence</span>
+            <p>The subsequent search returns jeans rather than shirts.</p>
+          </div>
+          <div class="verdict-card">
+            <div class="verdict-heading"><span>GPT-4.1 headline verdict</span><strong>2 / 5</strong></div>
+            <div class="verdict-scores">
+              <span class="fail">Intent <b>0</b></span>
+              <span>Clarify <b>1</b></span>
+              <span class="fail">Recommend <b>0</b></span>
+              <span>Cart <b>1</b></span>
+              <span class="fail">Ground <b>0</b></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section study-section" id="study" aria-labelledby="study-title">
+      <div class="container">
+        <div class="section-intro">
+          <p class="eyebrow">The controlled study</p>
+          <h2 id="study-title">A diagnostic stress test built from real shopping intent</h2>
+          <p>
+            The primary study starts with a public Amazon Reviews 2023 jeans catalog and a query pool
+            drawn from Semrush and Pinterest. A model-breaking filter retains twenty scenarios that expose
+            capability differences. Every model receives the same catalog, opening message, prompt, and tools.
+          </p>
+        </div>
+
+        <div class="study-equation" aria-label="Study scale">
+          <div><strong>3,229</strong><span>public jeans SKUs</span></div>
+          <span aria-hidden="true">→</span>
+          <div><strong>714</strong><span>shopping intents</span></div>
+          <span aria-hidden="true">→</span>
+          <div><strong>20</strong><span>hard scenarios</span></div>
+          <span aria-hidden="true">→</span>
+          <div class="study-total"><strong>12 × 20 × 5</strong><span>1,200 conversations</span></div>
+        </div>
+
+        <div class="study-note">
+          <span class="note-mark" aria-hidden="true">✦</span>
+          <div>
+            <h3>Designed for diagnosis</h3>
+            <p>
+              The scenario filter favours cases where at least one screening model fails a rubric.
+              This construction creates a demanding comparison set. Representative deployment quality
+              requires a separate sample of ordinary customer traffic.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section findings-section" id="findings" aria-labelledby="findings-title">
+      <div class="container">
+        <div class="section-intro">
+          <p class="eyebrow">Empirical findings</p>
+          <h2 id="findings-title">Capability profiles reveal more than a leaderboard</h2>
+          <p>
+            Aggregate scores establish broad performance bands. The five rubrics show how models arrive
+            there, while repeated runs and bootstrap intervals show which apparent differences can support
+            a decision.
+          </p>
+        </div>
+
+        <div class="figure-grid">
+          <figure class="research-figure">
+            <img src="assets/figures/rubric_heatmap.webp" width="1800" height="1260" loading="lazy" alt="Heatmap of intent, clarification, recommendation, cart, and grounding pass rates for twelve evaluated models">
+            <figcaption>
+              <strong>Behaviour profiles expose different weaknesses.</strong>
+              Under the GPT-4.1 headline judge, Clarification ranges from 0.77 to 0.84 within ranks 1–7.
+              Grounding spans 0.51 to 1.00 across the full roster.
+            </figcaption>
+          </figure>
+          <figure class="research-figure">
+            <img src="assets/figures/leaderboard_errorbars.webp" width="1800" height="1128" loading="lazy" alt="Horizontal leaderboard chart with mean total scores and run-to-run standard deviation for twelve models">
+            <figcaption>
+              <strong>The leading models form an overlapping band.</strong>
+              Bootstrap intervals overlap for ranks 1–7. The top three means differ by at most 0.01,
+              below the run variation of the group.
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="finding-grid">
+          <article class="finding-card">
+            <span class="finding-metric">Ranks 1–7</span>
+            <h3>Fine-grained winner claims exceed the evidence</h3>
+            <p>The highest-scoring group shares overlapping confidence bands. Capability profiles and deployment constraints offer a stronger basis for selection than decimal rank.</p>
+          </article>
+          <article class="finding-card">
+            <span class="finding-metric">0.77–0.84</span>
+            <h3>Clarification differentiates the leading group</h3>
+            <p>Intent, recommendation, cart, and grounding approach saturation for several leaders under GPT-4.1. Clarification retains useful separation.</p>
+          </article>
+          <article class="finding-card">
+            <span class="finding-metric">0.51–1.00</span>
+            <h3>Grounding separates the wider roster</h3>
+            <p>The broadest rubric spread appears in product-claim grounding, connecting model quality directly to evidence returned by commerce tools.</p>
+          </article>
+          <article class="finding-card">
+            <span class="finding-metric">26B → ~1T</span>
+            <h3>Scale alone does not order this roster</h3>
+            <p>Models spanning more than an order of magnitude in total parameters appear in the leading band. Serving quality and behavioural fit remain consequential.</p>
+          </article>
+        </div>
+
+        <div class="ablation-block">
+          <div class="ablation-copy">
+            <p class="eyebrow">Tool-calling ablation</p>
+            <h3>Tool access changes the performance regime</h3>
+            <p>
+              Across two additional models, disabling tool calling lowers total scores by 2.2–2.8 rubric
+              passes and reduces Grounding from 0.83–0.90 to 0.06–0.16. Reliable commerce agents need
+              access to catalog evidence, along with behaviour that uses that evidence correctly.
+            </p>
+          </div>
+          <img src="assets/figures/grounding_ablation.webp" width="1400" height="623" loading="lazy" alt="Grounding pass rates for two models with tool calling enabled and disabled">
+        </div>
+
+        <div class="evidence-notes">
+          <article>
+            <h3>Repeated journeys capture system variation</h3>
+            <p>Dialogue resampling contributes more apparent instability than re-judging the same frozen trace. Five-run estimates reduce the risk of acting on a fortunate single conversation.</p>
+          </article>
+          <article>
+            <h3>Scenario design shapes relative rank</h3>
+            <p>Qwen3-32B moves from rank 11 on the curated jeans study to rank 1 across three smaller categories built with a different scenario protocol. The shift demonstrates scenario sensitivity.</p>
+          </article>
+          <article>
+            <h3>Evaluator choice remains part of the experiment</h3>
+            <p>Cross-family arbitration reduces verdict swing from 24.5% to 9.2%. On 103 hard cells from one human rater (11 pass / 92 fail), the reliable stack reaches 88.3% accuracy, below an always-fail dummy at 89.3%; κ = 0.273 is the more informative agreement figure. GPT-4.1 is too lenient on this slice (κ = −0.13).</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section practice-section" id="practice" aria-labelledby="practice-title">
+      <div class="container">
+        <div class="section-intro light-copy">
+          <p class="eyebrow light">From evidence to practice</p>
+          <h2 id="practice-title">A benchmark becomes useful when it improves system decisions</h2>
+          <p>
+            The controlled protocol supports choices throughout the lifecycle of a conversational
+            commerce system. Teams can retain the scientific discipline of matched evaluation while
+            adapting the catalog, scenarios, and success criteria to their own context.
+          </p>
+        </div>
+        <div class="practice-grid">
+          <article>
+            <span>01</span>
+            <h3>Choose for the experience</h3>
+            <p>Use capability profiles to match a model with the priorities of a deployment, including clarification quality, grounding, latency, and infrastructure constraints.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Improve the whole system</h3>
+            <p>Run matched tests across changes to the model, prompt, retriever, tool schema, or orchestration layer and locate the behaviour that moved.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>Protect release quality</h3>
+            <p>Keep benchmark packs as regression suites so a gain in recommendation fluency does not conceal a loss in cart correctness or grounding.</p>
+          </article>
+          <article>
+            <span>04</span>
+            <h3>Evaluate on the merchant catalog</h3>
+            <p>Rebuild the protocol around the products, intents, and actions that define a commerce experience, then report the resulting profile with uncertainty.</p>
+          </article>
+        </div>
+        <p class="practice-close">The framework turns model evaluation into an engineering feedback loop: measure the journey, inspect the trace, target the weakness, and test the change.</p>
+      </div>
+    </section>
+
+    <section class="section interpretation-section" aria-labelledby="interpretation-title">
+      <div class="container">
+        <div class="section-intro">
+          <p class="eyebrow">Interpretation and next steps</p>
+          <h2 id="interpretation-title">Strong evidence comes with a clearly defined boundary</h2>
+          <p>
+            The jeans study is a deliberately difficult worked example. Its controlled construction
+            supports diagnosis and method development. Broader deployment claims need representative
+            traffic, matched category protocols, and deeper human validation.
+          </p>
+        </div>
+        <div class="boundary-grid">
+          <article>
+            <h3>Study boundary</h3>
+            <p>Twenty model-breaking scenarios emphasize capability differences within one primary catalog. The roster reflects models available to the evaluation infrastructure at the time of the study.</p>
+          </article>
+          <article>
+            <h3>Measurement boundary</h3>
+            <p>The headline GPT-4.1 judge is stable yet lenient on the hard human-labelled slice. Human calibration currently covers 103 rubric cells from one reviewer.</p>
+          </article>
+          <article>
+            <h3>Transfer boundary</h3>
+            <p>Raw rankings depend on catalog, scenarios, prompt, tools, provider, and judge. The controlled structure and behaviour-level analysis are the transferable contribution.</p>
+          </article>
+        </div>
+        <div class="next-steps">
+          <span>Next</span>
+          <ul>
+            <li>Multi-reviewer human validation</li>
+            <li>Matched cross-category studies</li>
+            <li>Broader frontier-model coverage</li>
+            <li>Multilingual shopping journeys</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section programme-section" aria-labelledby="programme-title">
+      <div class="container">
+        <div class="section-intro">
+          <p class="eyebrow">A broader RAIL research programme</p>
+          <h2 id="programme-title">From evaluation to auditable, adaptive commerce</h2>
+          <p>
+            This paper supplies the measurement layer: it reveals where an agent succeeds or fails under
+            controlled conditions. Related RAIL work carries that evidence forward by verifying live
+            journey claims, exposing constrained decision traces, and adapting the interface to the
+            customer and the interaction.
+          </p>
+        </div>
+        <div class="programme-bridge" aria-label="Relationship among the research projects">
+          <span>Evaluate</span><i aria-hidden="true">→</i>
+          <span>Verify</span><i aria-hidden="true">→</i>
+          <span>Audit decisions</span><i aria-hidden="true">→</i>
+          <span>Adapt interaction</span>
+        </div>
+        <div class="programme-grid">
+          <a href="https://doi.org/10.1145/3774935.3812704" class="programme-card">
+            <span class="programme-tag">ACM UMAP 2026 · Accepted LBR</span>
+            <h3>User-State Verification in Conversational Commerce</h3>
+            <p>After this benchmark diagnoses journey-level weaknesses, trace invariants verify live agent claims against the state recorded by commerce systems.</p>
+            <span class="text-link">Read the paper <span aria-hidden="true">→</span></span>
+          </a>
+          <a href="https://rezolve.com/reports/mental-model-aware-retail-robots-neuro-symbolic-explainable-assistance-for-trustworthy-human-robot-commerce/" class="programme-card">
+            <span class="programme-tag">ICSR 2026 · ASIMOV · Accepted</span>
+            <h3>Mental-Model-Aware Retail Robots</h3>
+            <p>Where the benchmark scores outcomes, this Senka Krivic-led work adds symbolic constraints, contestability cues, and an auditable plan trace to retail assistance.</p>
+            <span class="text-link">Read the public report <span aria-hidden="true">→</span></span>
+          </a>
+          <a href="https://acii-conf.net/2026/" class="programme-card">
+            <span class="programme-tag">ACII 2026 · Demo under review</span>
+            <h3>ADA: Adaptive Voice Commerce</h3>
+            <p>The same evaluation discipline extends to voice and adaptive interfaces, where emotion and conversation dynamics can change the experience in real time.</p>
+            <span class="text-link">Visit ACII 2026 <span aria-hidden="true">→</span></span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section resources-section" id="resources" aria-labelledby="resources-title">
+      <div class="container">
+        <div class="section-intro light-copy">
+          <p class="eyebrow light">Open research resources</p>
+          <h2 id="resources-title">Read, run, and extend the benchmark</h2>
+          <p>
+            The public release contains the jeans catalog, twenty frozen scenarios, a minimal runner,
+            the five-rubric judge interface, and figure data. It supports local smoke tests and new
+            evaluations through OpenAI-compatible model and judge endpoints. The public judge is a
+            reference implementation and does not reproduce the internal evaluation service bit for bit.
+          </p>
+        </div>
+        <div class="resource-grid">
+          <a href="https://genai-ecommerce.github.io/assets/papers/GenAIECommerce2026/recsys2026-workshops_paper_99.pdf">
+            <span>PDF</span><strong>Published paper</strong><small>Methods, experiments, analysis, and limitations</small>
+          </a>
+          <a href="https://github.com/rezolved/conversational-commerce-benchmark-framework">
+            <span>GitHub</span><strong>Benchmark release</strong><small>Code, jeans catalog, scenarios, and tests</small>
+          </a>
+          <a href="https://genai-ecommerce.github.io/GenAIECommerce2026">
+            <span>RecSys</span><strong>Workshop programme</strong><small>GenAI-eCom 2026 papers and schedule</small>
+          </a>
+          <a href="https://amazon-reviews-2023.github.io/">
+            <span>Data</span><strong>Amazon Reviews 2023</strong><small>Source dataset for the released catalog slice</small>
+          </a>
+          <a href="https://www.rezolve.com/">
+            <span>Rezolve AI</span><strong>Commerce technology</strong><small>AI-powered discovery, engagement, and transactions</small>
+          </a>
+        </div>
+
+        <div class="citation-block">
+          <div>
+            <p class="eyebrow light">Citation</p>
+            <h3>Benchmarking Models for Conversational E-Commerce</h3>
+          </div>
+          <button class="copy-button" type="button" data-copy-citation>Copy BibTeX</button>
+          <pre id="citation"><code>@inproceedings{vorontsov2026benchmarking,
+  title     = {Benchmarking Models for Conversational E-Commerce:
+               A Reproducible Evaluation Framework},
+  author    = {Vorontsov, Yuri and Carvalho, Diogo S. and
+               Vorontsov, Anastasia and Platonova, Anna and
+               Gorovoy, Vladimir and Briskin, Ilya and
+               Tseitlin, Felix and Krivic, Senka and Ahmad, Salman},
+  booktitle = {Proceedings of the Third Workshop on Agentic and
+               Generative AI for E-Commerce (GenAIECommerce 2026)},
+  year      = {2026}
+}</code></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <img src="assets/logos/rezolve-mark-on-dark.svg" alt="Rezolve AI">
+        <p>Researching and building the next generation of intelligent commerce.</p>
+      </div>
+      <div>
+        <p class="footer-title">Research contact</p>
+        <a href="mailto:diogocarvalho@rezolve.com">diogocarvalho@rezolve.com</a>
+      </div>
+      <div>
+        <p class="footer-title">Paper</p>
+        <a href="https://genai-ecommerce.github.io/GenAIECommerce2026">GenAI-eCom at ACM RecSys 2026</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>© 2026 Rezolve Ai Labs</span>
+      <span>Paper distributed under CC BY 4.0 · Code under Apache 2.0</span>
+    </div>
+  </footer>
+
+  <div class="copy-toast" role="status" aria-live="polite" data-copy-toast>Copied to clipboard</div>
+</body>
+</html>

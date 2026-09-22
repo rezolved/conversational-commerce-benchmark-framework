@@ -7,7 +7,12 @@ Minimal public artefacts for:
 > Yuri Vorontsov, Diogo S. Carvalho, Anastasia Vorontsov, Anna Platonova,
 > Vladimir Gorovoy, Ilya Briskin, Felix Tseitlin, Senka Krivic, Salman Ahmad.
 > *GenAIECommerce 2026* (Third Workshop on Agentic and Generative AI for
-> E-Commerce), RecSys 2026, Minneapolis. CEUR-WS, CC BY 4.0.
+> E-Commerce), co-located with RecSys 2026, Minneapolis. Published on the
+> [workshop website](https://genai-ecommerce.github.io/GenAIECommerce2026)
+> under CC BY 4.0.
+
+[Explore the project website](https://rezolved.github.io/conversational-commerce-benchmark-framework/)
+or [read the published paper](https://genai-ecommerce.github.io/assets/papers/GenAIECommerce2026/recsys2026-workshops_paper_99.pdf).
 
 This dump is **jeans-only**: the Amazon Reviews 2023 jeans catalog, 20 frozen
 scenarios, and a minimal runner. It does **not** include conversation traces,
@@ -70,11 +75,11 @@ after vector retrieval. The index, tool schema, and prompts are fixed, but the
 re-ranker is therefore model-dependent rather than an identical external
 component.
 
-The paper's reported scores were produced by Rezolve AI's internal QuePasa
-evaluation endpoint. `src/benchmark/judge.py` is a public, OpenAI-compatible
-reference implementation of the same five-rubric interface. It supports new
-evaluations but cannot exactly reproduce proprietary judge outputs that are
-not part of this jeans-only release.
+The paper's reported scores were produced through an internal evaluation
+endpoint. `src/benchmark/judge.py` is a public, OpenAI-compatible reference
+implementation of the same five-rubric interface. It supports new evaluations
+but cannot exactly reproduce proprietary judge outputs that are not part of
+this jeans-only release.
 
 ## Five evaluation rubrics
 
