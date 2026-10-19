@@ -22,10 +22,9 @@ interaction. The relative asset paths also permit direct opening from
 
 ## Publication
 
-The publication source is the `docs/` folder on the repository's default
-branch. The live project page is:
+The live project page is hosted on the Rezolve Ai Labs research site:
 
-<https://diogocarvalho88.github.io/conversational-commerce-benchmark-framework/>
+<https://rails-papers.rezolve.cloud/cc-benchmark-framework/>
 
 The Open Graph cover is `assets/images/og-cover.png`; the page metadata uses
 its absolute live URL for social previews.
